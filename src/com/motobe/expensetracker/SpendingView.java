@@ -45,6 +45,8 @@ public class SpendingView extends Scene {
     protected static double REPAY_LOAN;
     private boolean isFirstRun = true;
 
+    private String currencyUnit= "NGN";
+
     public SpendingView(VBox root) {
         super(root);
         totalSpending = AppWindow.loadedSpending;
@@ -154,7 +156,7 @@ public class SpendingView extends Scene {
                 int tDay = newSpending.getTransactionDay();
                 int tMonth = newSpending.getTransactionMonth();
                 int tYear = newSpending.getTransactionYear();
-                FullScreenView.spentRegister.appendText("ID: " + tID + "\nAmount Spent: " + tAmount + "\nCategory: " + tCategory + "\nTransaction Date: " + tDay + "/" + tMonth + "/" + tYear + "\nTransaction Description: " + tDescription + "\n\n");
+                FullScreenView.spentRegister.appendText("ID: " + tID + "\nAmount Spent: " + tAmount + " " + currencyUnit + "\nCategory: " + tCategory + "\nTransaction Date: " + tDay + "/" + tMonth + "/" + tYear + "\nTransaction Description: " + tDescription + "\n\n");
                 totalSpending.add(newSpending);
                 this.setChartData();
             } catch (InputMismatchException var22) {

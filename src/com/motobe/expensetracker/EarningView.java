@@ -36,6 +36,8 @@ public class EarningView extends Scene {
     protected static double BORROWED;
     private boolean isFirstRun = true;
 
+    private String currencyUnit= "NGN";
+
     public EarningView(VBox root) {
         super(root);
         totalEarning = AppWindow.loadedEarning;
@@ -136,7 +138,7 @@ public class EarningView extends Scene {
                 int tDay = newEarning.getTransactionDay();
                 int tMonth = newEarning.getTransactionMonth();
                 int tYear = newEarning.getTransactionYear();
-                FullScreenView.earnedRegister.appendText("ID: " + tID + "\nAmount Earned: " + tAmount + "\nCategory: " + tCategory + "\nTransaction Date: " + tDay + "/" + tMonth + "/" + tYear + "\nTransaction Description: " + tDescription + "\n\n");
+                FullScreenView.earnedRegister.appendText("ID: " + tID + "\nAmount Earned: " + tAmount + " " + currencyUnit + "\nCategory: " + tCategory + "\nTransaction Date: " + tDay + "/" + tMonth + "/" + tYear + "\nTransaction Description: " + tDescription + "\n\n");
                 totalEarning.add(newEarning);
                 this.setChartData();
             } catch (InputMismatchException var22) {
