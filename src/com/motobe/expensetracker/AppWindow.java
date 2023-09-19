@@ -40,7 +40,7 @@ public class AppWindow extends Application {
         mainStage.setScene(mainView);
         mainStage.sizeToScene();
         mainStage.setResizable(true);
-        mainStage.getIcons().add(new Image((new File("appResources/images/icon/expenseIcon.png")).toURI().toString()));
+        mainStage.getIcons().add(new Image((new File("app-res\\icon-exp-calc.png")).toURI().toString()));
         mainStage.show();
         mainStage.setOnCloseRequest((event) -> {
             AppData.saveToJSON();
