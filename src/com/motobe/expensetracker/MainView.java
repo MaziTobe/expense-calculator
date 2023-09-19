@@ -1,12 +1,9 @@
 package com.motobe.expensetracker;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
@@ -18,16 +15,12 @@ import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
 public class MainView extends Scene {
-    private static double totalEarning;
-    private static double totalSpending;
     protected static PieChart myPieChart;
     private static Label totalEarnTag;
     private static Label totalSpendTag;
-    private static boolean isFirstRun;
 
     public MainView(VBox root) {
         super(root);
-        isFirstRun = true;
         ComboBox timeScaleSelector = new ComboBox();
         timeScaleSelector.getItems().add("Today's Transactions");
         timeScaleSelector.getItems().add("Transactions Month to Date");
@@ -36,7 +29,7 @@ public class MainView extends Scene {
         HBox timeScaleContainer = new HBox();
         timeScaleContainer.setAlignment(Pos.CENTER);
         timeScaleContainer.setPrefSize(400.0D, 60.0D);
-        timeScaleContainer.getChildren().addAll(new Node[]{timeScaleSelector});
+        timeScaleContainer.getChildren().addAll(timeScaleSelector);
         myPieChart = new PieChart();
         myPieChart.setTitle("Total Earned and Spent Chart");
         myPieChart.setBackground(AppState.chartBackground);
@@ -51,7 +44,7 @@ public class MainView extends Scene {
         HBox chartBox = new HBox();
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPrefSize(400.0D, 240.0D);
-        chartBox.getChildren().addAll(new Node[]{myPieChart});
+        chartBox.getChildren().addAll(myPieChart);
         totalEarnTag = new Label();
         totalEarnTag.setBackground(AppState.labelBackground);
         totalEarnTag.setFont(AppState.labelFont);
@@ -70,90 +63,58 @@ public class MainView extends Scene {
         createSpendButton.setTextAlignment(TextAlignment.CENTER);
         createSpendButton.setFont(AppState.textFont);
         createSpendButton.setFill(AppState.textColorNormal);
-        createSpendButton.setOnMouseEntered((event) -> {
-            createSpendButton.setFill(AppState.textColorHover);
-        });
-        createSpendButton.setOnMouseExited((event) -> {
-            createSpendButton.setFill(AppState.textColorNormal);
-        });
-        createSpendButton.setOnMousePressed((event) -> {
-            AppWindow.mainStage.setScene(AppWindow.spendingView);
-        });
+        createSpendButton.setOnMouseEntered((event) -> createSpendButton.setFill(AppState.textColorHover));
+        createSpendButton.setOnMouseExited((event) -> createSpendButton.setFill(AppState.textColorNormal));
+        createSpendButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.spendingView));
         HBox createSpendBox = new HBox();
         createSpendBox.setAlignment(Pos.CENTER);
         createSpendBox.setPrefSize(400.0D, 90.0D);
-        createSpendBox.getChildren().addAll(new Node[]{createSpendButton});
+        createSpendBox.getChildren().addAll(createSpendButton);
         Text createEarnButton = new Text();
         createEarnButton.setText("CREATE EARNING");
         createEarnButton.setTextAlignment(TextAlignment.CENTER);
         createEarnButton.setFont(AppState.textFont);
         createEarnButton.setFill(AppState.textColorNormal);
-        createEarnButton.setOnMouseEntered((event) -> {
-            createEarnButton.setFill(AppState.textColorHover);
-        });
-        createEarnButton.setOnMouseExited((event) -> {
-            createEarnButton.setFill(AppState.textColorNormal);
-        });
-        createEarnButton.setOnMousePressed((event) -> {
-            AppWindow.mainStage.setScene(AppWindow.earningView);
-        });
+        createEarnButton.setOnMouseEntered((event) -> createEarnButton.setFill(AppState.textColorHover));
+        createEarnButton.setOnMouseExited((event) -> createEarnButton.setFill(AppState.textColorNormal));
+        createEarnButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.earningView));
         HBox createEarnBox = new HBox();
         createEarnBox.setAlignment(Pos.CENTER);
         createEarnBox.setPrefSize(400.0D, 60.0D);
-        createEarnBox.getChildren().addAll(new Node[]{createEarnButton});
+        createEarnBox.getChildren().addAll(createEarnButton);
         Text gotoLOGScreenButton = new Text();
         gotoLOGScreenButton.setText("TRANSACTION LOG");
         gotoLOGScreenButton.setTextAlignment(TextAlignment.CENTER);
         gotoLOGScreenButton.setFont(AppState.textFont);
         gotoLOGScreenButton.setFill(AppState.textColorNormal);
-        gotoLOGScreenButton.setOnMouseEntered((event) -> {
-            gotoLOGScreenButton.setFill(AppState.textColorHover);
-        });
-        gotoLOGScreenButton.setOnMouseExited((event) -> {
-            gotoLOGScreenButton.setFill(AppState.textColorNormal);
-        });
-        gotoLOGScreenButton.setOnMousePressed((event) -> {
-            AppWindow.mainStage.setScene(AppWindow.fullScreenView);
-        });
+        gotoLOGScreenButton.setOnMouseEntered((event) -> gotoLOGScreenButton.setFill(AppState.textColorHover));
+        gotoLOGScreenButton.setOnMouseExited((event) -> gotoLOGScreenButton.setFill(AppState.textColorNormal));
+        gotoLOGScreenButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.fullScreenView));
         HBox gotoFullScreenBox = new HBox();
         gotoFullScreenBox.setAlignment(Pos.CENTER);
         gotoFullScreenBox.setPrefSize(400.0D, 90.0D);
-        gotoFullScreenBox.getChildren().addAll(new Node[]{gotoLOGScreenButton});
+        gotoFullScreenBox.getChildren().addAll(gotoLOGScreenButton);
         root.setPrefSize(400.0D, 600.0D);
         root.setBackground(AppState.appBackground);
         root.setAlignment(Pos.CENTER);
-        root.getChildren().addAll(new Node[]{timeScaleContainer, chartBox, totalEarnTag, totalSpendTag, createSpendBox, createEarnBox, gotoFullScreenBox});
+        root.getChildren().addAll(timeScaleContainer, chartBox, totalEarnTag,
+                totalSpendTag, createSpendBox, createEarnBox, gotoFullScreenBox);
     }
 
     protected static void setChartData() {
-        totalEarning = 0.0D;
-        totalSpending = 0.0D;
-        if (isFirstRun) {
-            totalEarning = AppWindow.totalEarning;
-            totalSpending = AppWindow.totalSpending;
-            isFirstRun = false;
-        } else {
-            double allEarn = 0.0D;
-            double allSpend = 0.0D;
-            ArrayList<Earning> earningRecords = EarningView.totalEarning;
+        double totalEarning = 0.0D;
+        double totalSpending = 0.0D;
 
-            Earning earned;
-            for(Iterator var5 = earningRecords.iterator(); var5.hasNext(); allEarn += earned.getAmountEarned()) {
-                earned = (Earning)var5.next();
-            }
-
-            ArrayList<Spending> spendingRecords = SpendingView.totalSpending;
-
-            Spending spent;
-            for(Iterator var10 = spendingRecords.iterator(); var10.hasNext(); allSpend += spent.getAmountSpent()) {
-                spent = (Spending)var10.next();
-            }
-
-            totalEarning = allEarn + AppWindow.totalEarning;
-            totalSpending = allSpend + AppWindow.totalSpending;
+        for(Earning earn: AppData.loadedEarning){
+            totalEarning = totalEarning + earn.getAmountEarned();
         }
 
-        ObservableList<Data> myPieChartData = FXCollections.observableArrayList(new Data[]{new Data("Earned", totalEarning), new Data("Spent", totalSpending)});
+        for(Spending spend: AppData.loadedSpending){
+            totalSpending = totalSpending + spend.getAmountSpent();
+        }
+
+        ObservableList<Data> myPieChartData = FXCollections.observableArrayList(
+                new Data("Earned", totalEarning), new Data("Spent", totalSpending));
         myPieChart.setData(myPieChartData);
         totalEarnTag.setText("\tEARNED: N" + totalEarning);
         totalSpendTag.setText("SPENT: N" + totalSpending + "\t");

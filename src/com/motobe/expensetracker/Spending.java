@@ -1,5 +1,8 @@
 package com.motobe.expensetracker;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Spending {
     private double amountSpent;
     private String transactionID;
@@ -9,41 +12,75 @@ public class Spending {
     private String transactionDescription;
     private String transactionCategory;
 
-    public Spending(double tAmount, String tID, String tDescription, String tCategory, int tDay, int tMonth, int tYear) {
-        this.amountSpent = tAmount;
-        this.transactionID = tID;
-        this.transactionDescription = tDescription;
-        this.transactionCategory = tCategory;
-        this.transactionDay = tDay;
-        this.transactionMonth = tMonth;
-        this.transactionYear = tYear;
+    public Spending() {
     }
 
     public double getAmountSpent() {
-        return this.amountSpent;
+        return amountSpent;
+    }
+
+    public void setAmountSpent(double amountSpent) {
+        this.amountSpent = amountSpent;
     }
 
     public String getTransactionID() {
-        return this.transactionID;
+        return transactionID;
+    }
+
+    public void setTransactionID(String transactionID) {
+        this.transactionID = transactionID;
     }
 
     public int getTransactionDay() {
-        return this.transactionDay;
+        return transactionDay;
+    }
+
+    public void setTransactionDay(int transactionDay) {
+        this.transactionDay = transactionDay;
     }
 
     public int getTransactionMonth() {
-        return this.transactionMonth;
+        return transactionMonth;
+    }
+
+    public void setTransactionMonth(int transactionMonth) {
+        this.transactionMonth = transactionMonth;
     }
 
     public int getTransactionYear() {
-        return this.transactionYear;
+        return transactionYear;
+    }
+
+    public void setTransactionYear(int transactionYear) {
+        this.transactionYear = transactionYear;
     }
 
     public String getTransactionDescription() {
-        return this.transactionDescription;
+        return transactionDescription;
+    }
+
+    public void setTransactionDescription(String transactionDescription) {
+        this.transactionDescription = transactionDescription;
     }
 
     public String getTransactionCategory() {
-        return this.transactionCategory;
+        return transactionCategory;
+    }
+
+    public void setTransactionCategory(String transactionCategory) {
+        this.transactionCategory = transactionCategory;
+    }
+
+    @Override
+    public String toString() {
+        return "Spending{" +
+                "amountSpent=" + amountSpent +
+                ", transactionID='" + transactionID + '\'' +
+                ", transactionDay=" + transactionDay +
+                ", transactionMonth=" + transactionMonth +
+                ", transactionYear=" + transactionYear +
+                ", transactionDescription='" + transactionDescription + '\'' +
+                ", transactionCategory='" + transactionCategory + '\'' +
+                '}';
     }
 }

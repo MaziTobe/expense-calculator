@@ -25,12 +25,12 @@ public class FullScreenView extends Scene {
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(menu);
         earnedRegister = new TextArea();
-        earnedRegister.setText(AppWindow.loadedEarningText);
+        earnedRegister.setText("<Log of all Earning>\n\n");
         earnedRegister.setPrefSize(400.0D, 600.0D);
         earnedRegister.setEditable(false);
         earnedRegister.setWrapText(true);
         spentRegister = new TextArea();
-        spentRegister.setText(AppWindow.loadedSpendingText);
+        spentRegister.setText("<Log of all Spending>\n\n");
         spentRegister.setPrefSize(400.0D, 600.0D);
         spentRegister.setEditable(false);
         spentRegister.setWrapText(true);
