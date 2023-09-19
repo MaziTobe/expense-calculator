@@ -15,11 +15,11 @@ import javafx.stage.StageStyle;
 
 import java.time.LocalDate;
 
-public class FullScreenView extends Scene {
+public class TransactionRecordView extends Scene {
     protected static TextArea earnedRegister;
     protected static TextArea spentRegister;
 
-    public FullScreenView(BorderPane root) {
+    public TransactionRecordView(BorderPane root) {
         super(root);
         MenuItem selectLog = new MenuItem("SELECT LOG TO SHOW");
         selectLog.setOnAction((event) -> {

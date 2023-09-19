@@ -16,7 +16,7 @@ public class AppWindow extends Application {
     protected static MainView mainView;
     protected static EarningView earningView;
     protected static SpendingView spendingView;
-    protected static FullScreenView fullScreenView;
+    protected static TransactionRecordView fullScreenView;
 
     private static int sessionStartTime;
     private static int sessionStopTime;
@@ -34,7 +34,7 @@ public class AppWindow extends Application {
         mainView = new MainView(new VBox());
         earningView = new EarningView(new VBox());
         spendingView = new SpendingView(new VBox());
-        fullScreenView = new FullScreenView(new BorderPane());
+        fullScreenView = new TransactionRecordView(new BorderPane());
 
         mainStage.setTitle("My Expense Tracker");
         mainStage.setScene(mainView);
