@@ -14,6 +14,8 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 
+import java.time.LocalDate;
+
 public class MainView extends Scene {
     protected static PieChart myPieChart;
     private static Label totalEarnTag;
@@ -65,7 +67,10 @@ public class MainView extends Scene {
         createSpendButton.setFill(AppState.textColorNormal);
         createSpendButton.setOnMouseEntered((event) -> createSpendButton.setFill(AppState.textColorHover));
         createSpendButton.setOnMouseExited((event) -> createSpendButton.setFill(AppState.textColorNormal));
-        createSpendButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.spendingView));
+        createSpendButton.setOnMousePressed((event) -> {
+            AppWindow.setWindowTitle("expense input view");
+            AppWindow.mainStage.setScene(AppWindow.spendingView);
+        });
         HBox createSpendBox = new HBox();
         createSpendBox.setAlignment(Pos.CENTER);
         createSpendBox.setPrefSize(400.0D, 90.0D);
@@ -77,7 +82,10 @@ public class MainView extends Scene {
         createEarnButton.setFill(AppState.textColorNormal);
         createEarnButton.setOnMouseEntered((event) -> createEarnButton.setFill(AppState.textColorHover));
         createEarnButton.setOnMouseExited((event) -> createEarnButton.setFill(AppState.textColorNormal));
-        createEarnButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.earningView));
+        createEarnButton.setOnMousePressed((event) -> {
+            AppWindow.setWindowTitle("income input view");
+            AppWindow.mainStage.setScene(AppWindow.earningView);
+        });
         HBox createEarnBox = new HBox();
         createEarnBox.setAlignment(Pos.CENTER);
         createEarnBox.setPrefSize(400.0D, 60.0D);
@@ -89,7 +97,12 @@ public class MainView extends Scene {
         gotoLOGScreenButton.setFill(AppState.textColorNormal);
         gotoLOGScreenButton.setOnMouseEntered((event) -> gotoLOGScreenButton.setFill(AppState.textColorHover));
         gotoLOGScreenButton.setOnMouseExited((event) -> gotoLOGScreenButton.setFill(AppState.textColorNormal));
-        gotoLOGScreenButton.setOnMousePressed((event) -> AppWindow.mainStage.setScene(AppWindow.fullScreenView));
+        gotoLOGScreenButton.setOnMousePressed((event) -> {
+            AppWindow.setWindowTitle("transaction records");
+            TransactionRecordView.logRecord("day", LocalDate.now().getDayOfMonth(),
+                    LocalDate.now().getMonthValue(),LocalDate.now().getYear());
+            AppWindow.mainStage.setScene(AppWindow.transactionRecordView);
+        });
         HBox gotoFullScreenBox = new HBox();
         gotoFullScreenBox.setAlignment(Pos.CENTER);
         gotoFullScreenBox.setPrefSize(400.0D, 90.0D);
@@ -105,11 +118,11 @@ public class MainView extends Scene {
         double totalEarning = 0.0D;
         double totalSpending = 0.0D;
 
-        for(Earning earn: AppData.loadedEarning){
+        for(Earning earn: AppDataSaver.loadedEarning){
             totalEarning = totalEarning + earn.getAmountEarned();
         }
 
-        for(Spending spend: AppData.loadedSpending){
+        for(Spending spend: AppDataSaver.loadedSpending){
             totalSpending = totalSpending + spend.getAmountSpent();
         }
 

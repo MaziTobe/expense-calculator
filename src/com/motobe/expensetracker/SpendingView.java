@@ -7,19 +7,21 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class SpendingView extends Scene {
     private final PieChart myPieChart;
@@ -106,12 +108,15 @@ public class SpendingView extends Scene {
                 newSpending.setTransactionDay(Integer.parseInt((new SimpleDateFormat("dd")).format(new Date())));
                 newSpending.setTransactionMonth(Integer.parseInt((new SimpleDateFormat("MM")).format(new Date())));
                 newSpending.setTransactionYear(Integer.parseInt((new SimpleDateFormat("yyyy")).format(new Date())));
-                AppData.loadedSpending.add(newSpending);
+                AppDataSaver.loadedSpending.add(newSpending);
                 setChartData();
+                AppDataSaver.saveToJSON();
             } catch (InputMismatchException var22) {
-                new Alert(AlertType.ERROR,"Only numbers accepted for the amount input").show();
+                new ErrorMessage("Error Saving Expense Data!",
+                        "Only numbers accepted for the amount input").show();
             } catch (NoSuchElementException var23) {
-                new Alert(AlertType.ERROR,"All fields must be filled").show();
+                new ErrorMessage("Error Saving Expense Data!",
+                        "All fields must be filled").show();
             }
             amountInput.setText("");
             categorySelector.setValue(null);
@@ -124,6 +129,7 @@ public class SpendingView extends Scene {
         gotoMainView.setPrefSize(80.0D, 30.0D);
         gotoMainView.setOnAction((event) -> {
             MainView.setChartData();
+            AppWindow.setWindowTitle("home");
             AppWindow.mainStage.setScene(AppWindow.mainView);
         });
         HBox submitAndGotoBox = new HBox();
@@ -154,7 +160,7 @@ public class SpendingView extends Scene {
         double HELP_STRANGER = 0.0D;
         double REPAY_LOAN = 0.0D;
 
-        for(Spending spend: AppData.loadedSpending){
+        for(Spending spend: AppDataSaver.loadedSpending){
             switch (spend.getTransactionCategory()) {
                 case "POCKET_SELF":
                     POCKET_SELF += spend.getAmountSpent();

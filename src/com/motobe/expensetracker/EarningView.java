@@ -7,19 +7,21 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class EarningView extends Scene {
     private final PieChart myPieChart;
@@ -106,12 +108,15 @@ public class EarningView extends Scene {
                 newEarning.setTransactionDay(Integer.parseInt((new SimpleDateFormat("dd")).format(new Date())));
                 newEarning.setTransactionMonth(Integer.parseInt((new SimpleDateFormat("MM")).format(new Date())));
                 newEarning.setTransactionYear(Integer.parseInt((new SimpleDateFormat("yyyy")).format(new Date())));
-                AppData.loadedEarning.add(newEarning);
+                AppDataSaver.loadedEarning.add(newEarning);
                 setChartData();
+                AppDataSaver.saveToJSON();
             } catch (InputMismatchException exc) {
-                new Alert(AlertType.ERROR,"Only numbers accepted for the amount input").show();
+                new ErrorMessage("Error Saving Income Data!",
+                        "Only numbers accepted for the amount input").show();
             } catch (NoSuchElementException exc) {
-                new Alert(AlertType.ERROR,"All fields must be filled").show();
+                new ErrorMessage("Error Saving Income Data!",
+                        "All fields must be filled").show();
             }
             amountInput.setText("");
             categorySelector.setValue(null);
@@ -123,7 +128,8 @@ public class EarningView extends Scene {
         gotoMainView.setBackground(AppState.quitButtonBackground);
         gotoMainView.setPrefSize(80.0D, 30.0D);
         gotoMainView.setOnAction((event) -> {
-            //MainView.setChartData();
+            MainView.setChartData();
+            AppWindow.setWindowTitle("home");
             AppWindow.mainStage.setScene(AppWindow.mainView);
         });
         HBox submitAndGotoBox = new HBox();
@@ -145,7 +151,7 @@ public class EarningView extends Scene {
         double PROFIT_FROM_TRADES = 0.0D;
         double BORROWED = 0.0D;
 
-        for(Earning earn: AppData.loadedEarning){
+        for(Earning earn: AppDataSaver.loadedEarning){
             switch (earn.getTransactionCategory()) {
                 case "SALARY":
                     SALARY += earn.getAmountEarned();

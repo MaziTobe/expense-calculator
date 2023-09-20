@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -18,11 +17,14 @@ import java.time.LocalDate;
 public class TransactionRecordView extends Scene {
     protected static TextArea earnedRegister;
     protected static TextArea spentRegister;
+    private boolean isEarnShowing;
+    private VBox registerBox;
 
-    public TransactionRecordView(BorderPane root) {
+    public TransactionRecordView(VBox root) {
         super(root);
-        MenuItem selectLog = new MenuItem("SELECT LOG TO SHOW");
-        selectLog.setOnAction((event) -> {
+        isEarnShowing=true;
+        MenuItem selectDateToLog = new MenuItem("select record to show");
+        selectDateToLog.setOnAction((event) -> {
             Stage popUpStage= new Stage();
             Label infoDisplay= new Label("Please select starting date and Interval to see list of transactions within that interval!");
             infoDisplay.setTextAlignment(TextAlignment.CENTER);
@@ -63,15 +65,38 @@ public class TransactionRecordView extends Scene {
             popUpStage.initOwner(AppWindow.mainStage);
             popUpStage.initStyle(StageStyle.UTILITY);
             popUpStage.initModality(Modality.APPLICATION_MODAL);
+            popUpStage.setX(AppWindow.mainStage.getX()+AppState.WIDTH*0.2);
+            popUpStage.setY(AppWindow.mainStage.getY()+AppState.HEIGHT*0.3);
+            popUpStage.toFront();
             popUpStage.show();
         });
         SeparatorMenuItem separatorMenuItem1 = new SeparatorMenuItem();
-        MenuItem backToMain = new MenuItem("GO TO MAIN VIEW");
-        backToMain.setOnAction((event) -> AppWindow.mainStage.setScene(AppWindow.mainView));
-        Menu menu = new Menu("LOG MENU");
-        menu.getItems().addAll(selectLog, separatorMenuItem1, backToMain);
+        MenuItem switchEarnSpend = new MenuItem("switch to expense record");
+        switchEarnSpend.setOnAction((event) -> {
+            if(isEarnShowing){
+                registerBox.getChildren().removeAll(earnedRegister,spentRegister);
+                registerBox.getChildren().add(spentRegister);
+                isEarnShowing=false;
+                switchEarnSpend.setText("switch to income record");
+            }else{
+                registerBox.getChildren().removeAll(earnedRegister,spentRegister);
+                registerBox.getChildren().add(earnedRegister);
+                isEarnShowing=true;
+                switchEarnSpend.setText("switch to expense record");
+            };
+        });
+        SeparatorMenuItem separatorMenuItem2 = new SeparatorMenuItem();
+        MenuItem backToMain = new MenuItem("back to main view");
+        backToMain.setOnAction((event) -> {
+            AppWindow.setWindowTitle("home");
+            AppWindow.mainStage.setScene(AppWindow.mainView);
+        });
+        Menu menu = new Menu("RECORD MENU");
+        menu.getItems().addAll(selectDateToLog, separatorMenuItem1, switchEarnSpend, separatorMenuItem2, backToMain);
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(menu);
+
+
         earnedRegister = new TextArea();
         earnedRegister.setText("<Log of all Earning>\n\n");
         earnedRegister.setPrefSize(400.0D, 600.0D);
@@ -82,18 +107,20 @@ public class TransactionRecordView extends Scene {
         spentRegister.setPrefSize(400.0D, 600.0D);
         spentRegister.setEditable(false);
         spentRegister.setWrapText(true);
-        root.setPrefSize(800.0D, 600.0D);
+
+        registerBox= new VBox(earnedRegister);
+
+        root.setPrefSize(400.0D, 600.0D);
         root.setBackground(AppState.appBackground);
-        root.setTop(menuBar);
-        root.setCenter(earnedRegister);
-        root.setRight(spentRegister);
+        root.getChildren().addAll(menuBar,registerBox);
+
     }
 
-    protected void logRecord(String timeInterval,int day, int month, int year){
+    protected static void logRecord(String timeInterval,int day, int month, int year){
         boolean isDay, isMonth, isYear;
         if(timeInterval.equalsIgnoreCase("day")){
             earnedRegister.setText("Log of all incomes on "+day+"\\"+month+"\\"+year+"\n\n");
-            for (Earning earning: AppData.loadedEarning){
+            for (Earning earning: AppDataSaver.loadedEarning){
                 isDay= earning.getTransactionDay()==day;
                 isMonth= earning.getTransactionMonth()==month;
                 isYear= earning.getTransactionYear()==year;
@@ -107,7 +134,7 @@ public class TransactionRecordView extends Scene {
                }
             }
             spentRegister.setText("Log of all expenses on "+day+"\\"+month+"\\"+year+"\n\n");
-            for (Spending spend: AppData.loadedSpending){
+            for (Spending spend: AppDataSaver.loadedSpending){
                 isDay= spend.getTransactionDay()==day;
                 isMonth= spend.getTransactionMonth()==month;
                 isYear= spend.getTransactionYear()==year;
@@ -122,7 +149,7 @@ public class TransactionRecordView extends Scene {
             }
         }else if(timeInterval.equalsIgnoreCase("month")){
             earnedRegister.setText("Log of all incomes in "+month+"\\"+year+"\n\n");
-            for (Earning earning: AppData.loadedEarning){
+            for (Earning earning: AppDataSaver.loadedEarning){
                 isMonth= earning.getTransactionMonth()==month;
                 isYear= earning.getTransactionYear()==year;
                 if(isMonth&&isYear){
@@ -135,7 +162,7 @@ public class TransactionRecordView extends Scene {
                 }
             }
             spentRegister.setText("Log of all expenses in "+month+"\\"+year+"\n\n");
-            for (Spending spend: AppData.loadedSpending){
+            for (Spending spend: AppDataSaver.loadedSpending){
                 isMonth= spend.getTransactionMonth()==month;
                 isYear= spend.getTransactionYear()==year;
                 if(isMonth&&isYear){
@@ -149,7 +176,7 @@ public class TransactionRecordView extends Scene {
             }
         }else if(timeInterval.equalsIgnoreCase("year")){
             earnedRegister.setText("Log of all incomes in "+year+"\n\n");
-            for (Earning earning: AppData.loadedEarning){
+            for (Earning earning: AppDataSaver.loadedEarning){
                 isYear= earning.getTransactionYear()==year;
                 if(isYear){
                     earnedRegister.appendText("ID: "+earning.getTransactionID()+"\n"
@@ -161,7 +188,7 @@ public class TransactionRecordView extends Scene {
                 }
             }
             spentRegister.setText("Log of all expenses in "+year+"\n\n");
-            for (Spending spend: AppData.loadedSpending){
+            for (Spending spend: AppDataSaver.loadedSpending){
                 isYear= spend.getTransactionYear()==year;
                 if(isYear){
                     spentRegister.appendText("ID: "+spend.getTransactionID()+"\n"

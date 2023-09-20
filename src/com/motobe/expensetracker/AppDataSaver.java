@@ -2,13 +2,20 @@ package com.motobe.expensetracker;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import javafx.scene.control.Alert;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class AppData {
+public class AppDataSaver {
 
     private static final ObjectMapper mapper = new ObjectMapper();
     private static final String jsonEarnFilePath = "expense-calc-data\\earnFile.JSON";
@@ -17,7 +24,7 @@ public class AppData {
     protected static ArrayList<Earning> loadedEarning;
     protected static ArrayList<Spending> loadedSpending;
 
-    public AppData( ) {
+    public AppDataSaver( ) {
 
      }
 
@@ -25,15 +32,14 @@ public class AppData {
         try{
             mapper.writeValue(new File(jsonEarnFilePath), loadedEarning);
         }catch(IOException e){
-            new Alert(Alert.AlertType.ERROR,
-                    "found no JSON file to log earnings!!!\nSee details below:\n"+e+"\n\n").show();
+            new ErrorMessage("Error Saving Income Data!",
+                    "Missing JSON file to log app data!!!\nSee details below:\n"+e+"\n\n").show();
         }
-
         try{
             mapper.writeValue(new File(jsonSpendFilePath), loadedSpending);
         }catch(IOException e){
-            new Alert(Alert.AlertType.ERROR,
-                    "found no JSON file to log spendings!!!\nSee details below:\n"+e+"\n\n").show();
+            new ErrorMessage("Error Saving Expense Data!",
+                    "Missing JSON file to log app data!!!\nSee details below:\n"+e+"\n\n").show();
         }
     }
 
@@ -41,20 +47,11 @@ public class AppData {
         try {
             loadedEarning = mapper.readValue(new File(jsonEarnFilePath),
                     new TypeReference<ArrayList<Earning>>(){});
-        }catch(IOException e){
-            loadedEarning = new ArrayList<>();
-            new Alert(Alert.AlertType.ERROR,
-                    "found no record of previous earnings log!!!\nSee details below:\n"+e+"\n\n").show();
-        }
-
-        try {
             loadedSpending = mapper.readValue(new File(jsonSpendFilePath),
                     new TypeReference<ArrayList<Spending>>(){});
         }catch(IOException e){
+            loadedEarning = new ArrayList<>();
             loadedSpending= new ArrayList<>();
-            new Alert(Alert.AlertType.ERROR,
-                    "found no record of previous spendings log!!!\nSee details below:\n"+e+"\n\n").show();
         }
-
     }
 }
