@@ -9,7 +9,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
+import javafx.scene.chart.*;
 import javafx.scene.chart.PieChart.Data;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
@@ -20,8 +20,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class EarningView extends Scene {
-    private final PieChart myPieChart;
     private static ComboBox timeScaleSelector;
+    private BarChart<String, Number> myBarChart;
 
     public EarningView(VBox root) {
         super(root);
@@ -37,20 +37,29 @@ public class EarningView extends Scene {
         timeScaleContainer.setAlignment(Pos.CENTER);
         timeScaleContainer.setPrefSize(400.0D, 60.0D);
         timeScaleContainer.getChildren().addAll(timeScaleSelector);
-        this.myPieChart = new PieChart();
-        this.myPieChart.setLabelLineLength(2.0D);
-        this.myPieChart.setTitle("Earning Category Chart");
-        this.myPieChart.setBackground(AppState.chartBackground);
-        this.myPieChart.setPrefSize(320.0D, 240.0D);
-        this.myPieChart.setMinSize(320.0D, 240.0D);
-        this.myPieChart.setMaxSize(320.0D, 240.0D);
-        this.myPieChart.setLegendVisible(true);
-        this.myPieChart.setOpacity(100.0D);
-        this.myPieChart.setVisible(true);
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        myBarChart = new BarChart<>(xAxis, yAxis);
+        myBarChart.setTitle("Earning Category Chart");
+        myBarChart.setBackground(AppState.chartBackground);
+        myBarChart.setPrefSize(320.0D, 240.0D);
+        myBarChart.setMinSize(320.0D, 240.0D);
+        myBarChart.setMaxSize(320.0D, 240.0D);
+        myBarChart.setAnimated(false);
+        myBarChart.setHorizontalGridLinesVisible(true);
+        myBarChart.setHorizontalZeroLineVisible(true);
+        myBarChart.setVerticalGridLinesVisible(true);
+        myBarChart.setVerticalZeroLineVisible(true);
+        myBarChart.setLegendVisible(false);
+        myBarChart.setOpacity(100.0D);
+        myBarChart.setVisible(true);
+        myBarChart.setBarGap(2);
+
         HBox chartBox = new HBox();
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPrefSize(400.0D, 240.0D);
-        chartBox.getChildren().addAll(this.myPieChart);
+        chartBox.getChildren().addAll(myBarChart);
         setChartData();
         Label amountTag = new Label("AMOUNT");
         amountTag.setBackground(AppState.labelBackground);
@@ -174,13 +183,13 @@ public class EarningView extends Scene {
             }
         }
 
-        ObservableList<Data> myPieChartData = FXCollections.observableArrayList(
-                new Data("SALARY", SALARY),
-                new Data("SALARY_BONUS", SALARY_BONUS),
-                new Data("GIFT_TO_ME", GIFT_TO_ME),
-                new Data("INVESTMENT_GAINS", INVESTMENT_GAINS),
-                new Data("PROFIT_FROM_TRADES", PROFIT_FROM_TRADES),
-                new Data("BORROWED", BORROWED));
-        this.myPieChart.setData(myPieChartData);
+        XYChart.Series<String, Number> myBarChartData = new XYChart.Series<>();
+        myBarChartData.getData().add(new XYChart.Data<>("SALARY", SALARY));
+        myBarChartData.getData().add(new XYChart.Data<>("SALARY_BONUS", SALARY_BONUS));
+        myBarChartData.getData().add(new XYChart.Data<>("GIFT_TO_ME", GIFT_TO_ME));
+        myBarChartData.getData().add(new XYChart.Data<>("INVESTMENT_GAINS", INVESTMENT_GAINS));
+        myBarChartData.getData().add(new XYChart.Data<>("PROFIT_FROM_TRADES", PROFIT_FROM_TRADES));
+        myBarChartData.getData().add(new XYChart.Data<>("BORROWED", BORROWED));
+        myBarChart.getData().add(myBarChartData);
     }
 }

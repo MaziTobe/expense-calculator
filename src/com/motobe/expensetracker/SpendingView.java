@@ -5,12 +5,9 @@ import java.util.Date;
 import java.util.InputMismatchException;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.chart.PieChart;
-import javafx.scene.chart.PieChart.Data;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -20,8 +17,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class SpendingView extends Scene {
-    private final PieChart myPieChart;
     private static ComboBox timeScaleSelector;
+    private BarChart<String, Number> myBarChart;
 
     public SpendingView(VBox root) {
         super(root);
@@ -37,20 +34,29 @@ public class SpendingView extends Scene {
         timeScaleContainer.setAlignment(Pos.CENTER);
         timeScaleContainer.setPrefSize(400.0D, 60.0D);
         timeScaleContainer.getChildren().addAll(timeScaleSelector);
-        this.myPieChart = new PieChart();
-        this.myPieChart.setLabelLineLength(2.0D);
-        this.myPieChart.setTitle("Expense Category Chart");
-        this.myPieChart.setBackground(AppState.chartBackground);
-        this.myPieChart.setPrefSize(320.0D, 240.0D);
-        this.myPieChart.setMinSize(320.0D, 240.0D);
-        this.myPieChart.setMaxSize(320.0D, 240.0D);
-        this.myPieChart.setLegendVisible(true);
-        this.myPieChart.setOpacity(100.0D);
-        this.myPieChart.setVisible(true);
+
+        CategoryAxis xAxis = new CategoryAxis();
+        NumberAxis yAxis = new NumberAxis();
+        myBarChart = new BarChart<>(xAxis, yAxis);
+        myBarChart.setTitle("Spending Category Chart");
+        myBarChart.setBackground(AppState.chartBackground);
+        myBarChart.setPrefSize(320.0D, 240.0D);
+        myBarChart.setMinSize(320.0D, 240.0D);
+        myBarChart.setMaxSize(320.0D, 240.0D);
+        myBarChart.setAnimated(false);
+        myBarChart.setHorizontalGridLinesVisible(true);
+        myBarChart.setHorizontalZeroLineVisible(true);
+        myBarChart.setVerticalGridLinesVisible(true);
+        myBarChart.setVerticalZeroLineVisible(true);
+        myBarChart.setLegendVisible(false);
+        myBarChart.setOpacity(100.0D);
+        myBarChart.setVisible(true);
+        myBarChart.setBarGap(2);
+
         HBox chartBox = new HBox();
         chartBox.setAlignment(Pos.CENTER);
         chartBox.setPrefSize(400.0D, 240.0D);
-        chartBox.getChildren().addAll(this.myPieChart);
+        chartBox.getChildren().addAll(myBarChart);
         setChartData();
         Label amountTag = new Label("AMOUNT");
         amountTag.setBackground(AppState.labelBackground);
@@ -210,22 +216,22 @@ public class SpendingView extends Scene {
             }
         }
 
-        ObservableList<Data> myPieChartData = FXCollections.observableArrayList(
-                new Data("POCKET_SELF", POCKET_SELF),
-                new Data("TRANSPORT_SELF", TRANSPORT_SELF),
-                new Data("FEEDING_SELF", FEEDING_SELF),
-                new Data("CLOTHING_SELF", CLOTHING_SELF),
-                new Data("BUY_THINGS_SELF", BUY_THINGS_SELF),
-                new Data("DO_PROJECT_SELF", DO_PROJECT_SELF),
-                new Data("EDUCATION_SELF", EDUCATION_SELF),
-                new Data("ENTERTAINMENT_SELF", ENTERTAINMENT_SELF),
-                new Data("INVESTMENT_SELF", INVESTMENT_SELF),
-                new Data("ASSIST_FAMILY", ASSIST_FAMILY),
-                new Data("LEND_FAMILY", LEND_FAMILY),
-                new Data("ASSIST_FRIEND", ASSIST_FRIEND),
-                new Data("LEND_FRIEND", LEND_FRIEND),
-                new Data("HELP_STRANGER", HELP_STRANGER),
-                new Data("REPAY_LOAN", REPAY_LOAN));
-        this.myPieChart.setData(myPieChartData);
+        XYChart.Series<String, Number> myBarChartData = new XYChart.Series<>();
+        myBarChartData.getData().add(new XYChart.Data<>("POCKET_SELF", POCKET_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("TRANSPORT_SELF", TRANSPORT_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("FEEDING_SELF", FEEDING_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("CLOTHING_SELF", CLOTHING_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("BUY_THINGS_SELF", BUY_THINGS_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("DO_PROJECT_SELF", DO_PROJECT_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("EDUCATION_SELF", EDUCATION_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("ENTERTAINMENT_SELF", ENTERTAINMENT_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("INVESTMENT_SELF", INVESTMENT_SELF));
+        myBarChartData.getData().add(new XYChart.Data<>("ASSIST_FAMILY", ASSIST_FAMILY));
+        myBarChartData.getData().add(new XYChart.Data<>("LEND_FAMILY", LEND_FAMILY));
+        myBarChartData.getData().add(new XYChart.Data<>("ASSIST_FRIEND", ASSIST_FRIEND));
+        myBarChartData.getData().add(new XYChart.Data<>("LEND_FRIEND", LEND_FRIEND));
+        myBarChartData.getData().add(new XYChart.Data<>("HELP_STRANGER", HELP_STRANGER));
+        myBarChartData.getData().add(new XYChart.Data<>("REPAY_LOAN", REPAY_LOAN));
+        myBarChart.getData().add(myBarChartData);
     }
 }

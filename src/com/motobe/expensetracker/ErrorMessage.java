@@ -3,17 +3,24 @@ package com.motobe.expensetracker;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 public class ErrorMessage extends Stage {
     public ErrorMessage(String errorTitle, String errorInfo){
-        TextArea infoDisplay= new TextArea(errorInfo);
+        Label infoDisplay= new Label(errorInfo);
         infoDisplay.setPrefSize(AppState.WIDTH*0.6,AppState.HEIGHT*0.3);
-        infoDisplay.setEditable(false);
+        infoDisplay.setAlignment(Pos.CENTER);
+        infoDisplay.setTextAlignment(TextAlignment.CENTER);
+        infoDisplay.setTextFill(Color.RED);
+        infoDisplay.setFont(Font.font(14));
         infoDisplay.setWrapText(true);
         VBox container = new VBox(infoDisplay);
         container.setAlignment(Pos.CENTER);
