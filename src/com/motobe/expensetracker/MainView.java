@@ -20,13 +20,17 @@ public class MainView extends Scene {
     protected static PieChart myPieChart;
     private static Label totalEarnTag;
     private static Label totalSpendTag;
+    private static ComboBox timeScaleSelector;
 
     public MainView(VBox root) {
         super(root);
-        ComboBox timeScaleSelector = new ComboBox();
-        timeScaleSelector.getItems().add("Today's Transactions");
-        timeScaleSelector.getItems().add("Transactions Month to Date");
-        timeScaleSelector.getItems().add("Transactions Year to Date");
+        timeScaleSelector = new ComboBox();
+        IntervalCategory[] intervalCategories= IntervalCategory.values();
+        for (IntervalCategory intervalCat : intervalCategories) {
+            timeScaleSelector.getItems().add(intervalCat);
+        }
+        timeScaleSelector.getSelectionModel().selectFirst();
+        timeScaleSelector.setOnAction(event -> setChartData());
         timeScaleSelector.setPrefSize(240.0D, 30.0D);
         HBox timeScaleContainer = new HBox();
         timeScaleContainer.setAlignment(Pos.CENTER);
@@ -114,16 +118,57 @@ public class MainView extends Scene {
                 totalSpendTag, createSpendBox, createEarnBox, gotoFullScreenBox);
     }
 
-    protected static void setChartData() {
+    protected static void setChartData(){
         double totalEarning = 0.0D;
         double totalSpending = 0.0D;
 
-        for(Earning earn: AppDataSaver.loadedEarning){
-            totalEarning = totalEarning + earn.getAmountEarned();
-        }
+        String timeInterval= timeScaleSelector.getSelectionModel().getSelectedItem().toString();
 
-        for(Spending spend: AppDataSaver.loadedSpending){
-            totalSpending = totalSpending + spend.getAmountSpent();
+        if(timeInterval.equalsIgnoreCase("TODAY")){
+            for (Earning earning: AppDataSaver.loadedEarning){
+                boolean isDay= earning.getTransactionDay()==LocalDate.now().getDayOfMonth();
+                boolean isMonth= earning.getTransactionMonth()==LocalDate.now().getMonthValue();
+                boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
+                if(isDay&&isMonth&&isYear){
+                    totalEarning = totalEarning + earning.getAmountEarned();
+                }
+            }
+            for (Spending spending: AppDataSaver.loadedSpending){
+                boolean isDay= spending.getTransactionDay()==LocalDate.now().getDayOfMonth();
+                boolean isMonth= spending.getTransactionMonth()==LocalDate.now().getMonthValue();
+                boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
+                if(isDay&&isMonth&&isYear){
+                    totalSpending = totalSpending + spending.getAmountSpent();
+                }
+            }
+        }else if(timeInterval.equalsIgnoreCase("THIS_MONTH")){
+            for (Earning earning: AppDataSaver.loadedEarning){
+                boolean isMonth= earning.getTransactionMonth()==LocalDate.now().getMonthValue();
+                boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
+                if(isMonth&&isYear){
+                    totalEarning = totalEarning + earning.getAmountEarned();
+                }
+            }
+            for (Spending spending: AppDataSaver.loadedSpending){
+                boolean isMonth= spending.getTransactionMonth()==LocalDate.now().getMonthValue();
+                boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
+                if(isMonth&&isYear){
+                    totalSpending = totalSpending + spending.getAmountSpent();
+                }
+            }
+        }else if(timeInterval.equalsIgnoreCase("THIS_YEAR")){
+            for (Earning earning: AppDataSaver.loadedEarning){
+                boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
+                if(isYear){
+                    totalEarning = totalEarning + earning.getAmountEarned();
+                }
+            }
+            for (Spending spending: AppDataSaver.loadedSpending){
+                boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
+                if(isYear){
+                    totalSpending = totalSpending + spending.getAmountSpent();
+                }
+            }
         }
 
         ObservableList<Data> myPieChartData = FXCollections.observableArrayList(

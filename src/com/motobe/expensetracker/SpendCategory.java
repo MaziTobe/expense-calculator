@@ -16,7 +16,4 @@ public enum SpendCategory {
     LEND_FRIEND,
     HELP_STRANGER,
     REPAY_LOAN;
-
-    private SpendCategory() {
-    }
 }

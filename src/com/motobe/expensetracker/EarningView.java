@@ -7,7 +7,6 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.chart.PieChart;
@@ -19,19 +18,20 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 public class EarningView extends Scene {
     private final PieChart myPieChart;
+    private static ComboBox timeScaleSelector;
 
     public EarningView(VBox root) {
         super(root);
-        ComboBox timeScaleSelector = new ComboBox();
-        timeScaleSelector.getItems().add("Today's Transactions");
-        timeScaleSelector.getItems().add("Transactions Month to Date");
-        timeScaleSelector.getItems().add("Transactions Year to Date");
+        timeScaleSelector = new ComboBox();
+        IntervalCategory[] intervalCategories= IntervalCategory.values();
+        for (IntervalCategory intervalCat : intervalCategories) {
+            timeScaleSelector.getItems().add(intervalCat);
+        }
+        timeScaleSelector.getSelectionModel().selectFirst();
+        timeScaleSelector.setOnAction(event -> setChartData());
         timeScaleSelector.setPrefSize(240.0D, 30.0D);
         HBox timeScaleContainer = new HBox();
         timeScaleContainer.setAlignment(Pos.CENTER);

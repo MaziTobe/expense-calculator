@@ -7,7 +7,4 @@ public enum EarnCategory {
     INVESTMENT_GAINS,
     PROFIT_FROM_TRADES,
     BORROWED;
-
-    private EarnCategory() {
-    }
 }
