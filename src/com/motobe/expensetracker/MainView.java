@@ -29,7 +29,7 @@ public class MainView extends Scene {
         for (IntervalCategory intervalCat : intervalCategories) {
             timeScaleSelector.getItems().add(intervalCat);
         }
-        timeScaleSelector.getSelectionModel().selectFirst();
+        timeScaleSelector.getSelectionModel().selectLast();
         timeScaleSelector.setOnAction(event -> setChartData());
         timeScaleSelector.setPrefSize(240.0D, 30.0D);
         HBox timeScaleContainer = new HBox();

@@ -96,21 +96,21 @@ public class TransactionRecordView extends Scene {
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(menu);
 
-
         earnedRegister = new TextArea();
         earnedRegister.setText("<Log of all Earning>\n\n");
-        earnedRegister.setPrefSize(400.0D, 600.0D);
+        earnedRegister.setPrefSize(AppState.WIDTH*0.94, AppState.HEIGHT*0.94);
         earnedRegister.setEditable(false);
         earnedRegister.setWrapText(true);
         spentRegister = new TextArea();
         spentRegister.setText("<Log of all Spending>\n\n");
-        spentRegister.setPrefSize(400.0D, 600.0D);
+        spentRegister.setPrefSize(AppState.WIDTH*0.94, AppState.HEIGHT*0.94);
         spentRegister.setEditable(false);
         spentRegister.setWrapText(true);
 
         registerBox= new VBox(earnedRegister);
+        registerBox.setPadding(new Insets(AppState.WIDTH*0.03));
 
-        root.setPrefSize(400.0D, 600.0D);
+        root.setPrefSize(AppState.WIDTH, AppState.HEIGHT);
         root.setBackground(AppState.appBackground);
         root.getChildren().addAll(menuBar,registerBox);
 
