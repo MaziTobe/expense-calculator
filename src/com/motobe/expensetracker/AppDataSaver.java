@@ -50,52 +50,44 @@ public class AppDataSaver {
     }
 
     protected static void createAppDataFolder(){
-        String pathToAppDataFolder="C:\\Program Files\\expense-calc-data";//+AppWindow.appName+"\\expense-calc-data";
+        String pathToAppDataFolder= System.getProperty("user.home")+"\\"+AppWindow.appName+"\\expense-calc-data";
         Path directory = Paths.get(pathToAppDataFolder);
-        /**********************************************************************/
-        System.out.println("folder does exist: "+Files.exists(directory));
-        System.out.println("folder does not exist: "+Files.notExists(directory));
-        /*****************************************************************************/
+        File saveDirectory = new File(String.valueOf(directory));
         if(!Files.exists(directory)){
             try {
                 Files.createDirectories(directory);
-                Files.createDirectory(directory);
+                System.out.println("expense-cal-data folder was created!");
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
-        /**********************************************************************/
-        System.out.println("folder exists now: "+Files.exists(directory));
-        /**********************************************************************/
-        File saveDirectory = new File(String.valueOf(directory));
         jsonEarnFilePath= saveDirectory.getPath()+"\\earnFile.JSON";
         jsonSpendFilePath= saveDirectory.getPath()+"\\spendFile.JSON";
-        setFolderAndFilesToReadOnlyAndHidden(saveDirectory);
-        /*******************************************************/
-        System.out.println("(expense-calc-data) name: "+ saveDirectory.getName());
-        System.out.println("(expense-calc-data) exist now: "+ saveDirectory.exists());
-        System.out.println("(expense-calc-data) is hidden: "+ saveDirectory.isHidden());
-        System.out.println("(expense-calc-data) children: "+ Arrays.toString(saveDirectory.list()));
-        /************************************************************/
-        System.out.println("earnFile.JSON does exist: "+Files.exists(Paths.get(jsonEarnFilePath)));
-        System.out.println("earnFile.JSON is executable: "+Files.isExecutable(Paths.get(jsonEarnFilePath)));
-        try{System.out.println("earnFile.JSON is hidden: "+Files.isHidden(Paths.get(jsonEarnFilePath)));}catch(IOException e){}
-        System.out.println("earnFile.JSON is readable: "+Files.isReadable(Paths.get(jsonEarnFilePath)));
-        System.out.println("earnFile.JSON is writable: "+Files.isWritable(Paths.get(jsonEarnFilePath)));
-        /************************************************************/
-        System.out.println("spendFile.JSON does exist: "+Files.exists(Paths.get(jsonSpendFilePath)));
-        System.out.println("spendFile.JSON is executable: "+Files.isExecutable(Paths.get(jsonSpendFilePath)));
-        try{System.out.println("spendFile.JSON is hidden: "+Files.isHidden(Paths.get(jsonSpendFilePath)));}catch(IOException e){}
-        System.out.println("spendFile.JSON is readable: "+Files.isReadable(Paths.get(jsonSpendFilePath)));
-        System.out.println("spendFile.JSON is writable: "+Files.isWritable(Paths.get(jsonSpendFilePath)));
+        if(!Files.exists(Paths.get(jsonEarnFilePath))){
+            try {
+                Files.createFile(Paths.get(jsonEarnFilePath));
+                System.out.println("earnFile.JSON file was created!");
+            }catch (IOException exc){
+                exc.printStackTrace();
+            }
+        }
+        if(!Files.exists(Paths.get(jsonSpendFilePath))){
+            try {
+                Files.createFile(Paths.get(jsonSpendFilePath));
+                System.out.println("spendFile.JSON file was created!");
+            }catch (IOException exc){
+                exc.printStackTrace();
+            }
+        }
+        setFoldersAndFilesToReadWriteHidden(new File(saveDirectory.getParent()));
     }
 
-    private static void setFolderAndFilesToReadOnlyAndHidden(File selectedFolder) {
+    private static void setFoldersAndFilesToReadWriteHidden(File selectedFolder) {
         if (selectedFolder.isDirectory()) {
             try {
                 // Set the folder as hidden (Windows)
                 ProcessBuilder builderFolder = new ProcessBuilder(
-                        "attrib", "+H", selectedFolder.getAbsolutePath());
+                        "attrib", "-R", "+H", selectedFolder.getAbsolutePath());
                 builderFolder.start().waitFor();
 
                 // Set all files and sub-folders as read-only and hidden recursively
@@ -104,7 +96,7 @@ public class AppDataSaver {
                     for (File fileInFolder : allFilesInFolder) {
                         // Set the file as read-only and hidden (Windows)
                         ProcessBuilder builderFile = new ProcessBuilder(
-                                "attrib", "+R", "+H", fileInFolder.getAbsolutePath());
+                                "attrib", "-R", "+H", fileInFolder.getAbsolutePath());
                         try {
                             builderFile.start().waitFor();
                         } catch (IOException | InterruptedException e) {

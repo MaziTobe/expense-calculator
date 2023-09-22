@@ -1,74 +1,30 @@
 package com.motobe.expensetracker;
 
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.text.TextAlignment;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 
 import java.time.LocalDate;
+import java.time.Month;
+
 
 public class TransactionRecordView extends Scene {
     protected static TextArea earnedRegister;
     protected static TextArea spentRegister;
     private boolean isEarnShowing;
     private VBox registerBox;
+    private Menu filterByCategory;
+    private static Menu filterByDate;
 
     public TransactionRecordView(VBox root) {
         super(root);
         isEarnShowing=true;
-        MenuItem selectDateToLog = new MenuItem("select record to show");
-        selectDateToLog.setOnAction((event) -> {
-            Stage popUpStage= new Stage();
-            Label infoDisplay= new Label("Please select starting date and Interval to see list of transactions within that interval!");
-            infoDisplay.setTextAlignment(TextAlignment.CENTER);
-            infoDisplay.setWrapText(true);
-            DatePicker datePicker= new DatePicker();
-            Label timeIntervalTag= new Label("Record Interval: ");
-            ComboBox timeIntervalSelector = new ComboBox();
-            timeIntervalSelector.getItems().add("day");
-            timeIntervalSelector.getItems().add("month");
-            timeIntervalSelector.getItems().add("year");
-            HBox timeIntervalBox= new HBox(timeIntervalTag,timeIntervalSelector);
-            timeIntervalBox.setSpacing(5);
-            timeIntervalBox.setAlignment(Pos.CENTER);
-            Button submitSelection= new Button("submit");
-            submitSelection.setOnAction(event1 -> {
-                try{
-                    String timeInterval = timeIntervalSelector.getSelectionModel().getSelectedItem().toString();
-                    LocalDate localDate= datePicker.getValue();
-                    int day = localDate.getDayOfMonth();
-                    int month = localDate.getMonthValue();
-                    int year = localDate.getYear();
-                    logRecord(timeInterval,day,month,year);
-                    popUpStage.close();
-                }catch (Exception exc){
-                    infoDisplay.setTextFill(new Color(1,0,0,1));
-                    infoDisplay.setText("Select starting date and interval!!!");
-                }
-            });
-            VBox container = new VBox();
-            container.setAlignment(Pos.CENTER);
-            container.setPrefSize(AppState.WIDTH*0.6,AppState.HEIGHT*0.3);
-            container.setSpacing(10);
-            container.setPadding(new Insets(5));
-            container.getChildren().addAll(infoDisplay,datePicker,timeIntervalBox,submitSelection);
-            Scene popUpScene= new Scene(container);
-            popUpStage.setScene(popUpScene);
-            popUpStage.setTitle("Record Selection");
-            popUpStage.initOwner(AppWindow.mainStage);
-            popUpStage.initStyle(StageStyle.UTILITY);
-            popUpStage.initModality(Modality.APPLICATION_MODAL);
-            popUpStage.setX(AppWindow.mainStage.getX()+AppState.WIDTH*0.2);
-            popUpStage.setY(AppWindow.mainStage.getY()+AppState.HEIGHT*0.3);
-            popUpStage.toFront();
-            popUpStage.show();
+
+        MenuItem selectYearToLog = new MenuItem("select year to see record");
+        selectYearToLog.setOnAction((event) -> {
+            String instruction="Please choose a year to see list of transactions within that year!";
+            new SelectionPopUp(false,instruction).show();
         });
         SeparatorMenuItem separatorMenuItem1 = new SeparatorMenuItem();
         MenuItem switchEarnSpend = new MenuItem("switch to expense record");
@@ -83,7 +39,8 @@ public class TransactionRecordView extends Scene {
                 registerBox.getChildren().add(earnedRegister);
                 isEarnShowing=true;
                 switchEarnSpend.setText("switch to expense record");
-            };
+            }
+            setFilterByCategoryItems();
         });
         SeparatorMenuItem separatorMenuItem2 = new SeparatorMenuItem();
         MenuItem backToMain = new MenuItem("back to main view");
@@ -91,10 +48,25 @@ public class TransactionRecordView extends Scene {
             AppWindow.setWindowTitle("home");
             AppWindow.mainStage.setScene(AppWindow.mainView);
         });
-        Menu menu = new Menu("RECORD MENU");
-        menu.getItems().addAll(selectDateToLog, separatorMenuItem1, switchEarnSpend, separatorMenuItem2, backToMain);
+        Menu menu = new Menu("Record Menu");
+        menu.getItems().addAll(selectYearToLog, separatorMenuItem1, switchEarnSpend, separatorMenuItem2, backToMain);
+
+        filterByDate= new Menu("Filter By Date");
+        setFilterByDateItems(2030);//LocalDate.now().getYear());
+        SeparatorMenuItem separatorMenuItem3 = new SeparatorMenuItem();
+        filterByCategory= new Menu("Filter By Category");
+        setFilterByCategoryItems();
+        SeparatorMenuItem separatorMenuItem4 = new SeparatorMenuItem();
+        MenuItem goToSpecificDay= new MenuItem("Go to Specific Day");
+        goToSpecificDay.setOnAction(event -> {
+            String instruction="Please select date to see transaction on that day!";
+            new SelectionPopUp(true,instruction).show();
+        });
+        Menu menu2 = new Menu("Record Filter");
+        menu2.getItems().addAll(filterByDate,separatorMenuItem3,filterByCategory,separatorMenuItem4,goToSpecificDay);
+
         MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().add(menu);
+        menuBar.getMenus().addAll(menu,menu2);
 
         earnedRegister = new TextArea();
         earnedRegister.setText("<Log of all Earning>\n\n");
@@ -113,7 +85,73 @@ public class TransactionRecordView extends Scene {
         root.setPrefSize(AppState.WIDTH, AppState.HEIGHT);
         root.setBackground(AppState.appBackground);
         root.getChildren().addAll(menuBar,registerBox);
+    }
 
+    private static boolean isCurrentYear(int selectedYear){
+        return selectedYear==LocalDate.now().getYear();
+    }
+
+    private static void setFilterByDateItems(int selectedYear){
+        if(isCurrentYear(selectedYear)){
+            filterByDate.getItems().clear();
+            IntervalCategory[] intervalCategories= IntervalCategory.values();
+            for(IntervalCategory interval: intervalCategories){
+                MenuItem intervalCatItem= new MenuItem(String.valueOf(interval));
+                filterByDate.getItems().add(intervalCatItem);
+                intervalCatItem.setOnAction(event -> {
+                    System.out.println(interval +" was selected");
+                });
+            }
+        }else{
+            filterByDate.getItems().clear();
+            Month[] months = Month.values();
+            for (Month month : months) {
+                MenuItem dateCatItem= new MenuItem(String.valueOf(month));
+                filterByDate.getItems().add(dateCatItem);
+                dateCatItem.setOnAction(event -> {
+                    System.out.println(month +" was selected");
+                });
+            }
+        }
+    }
+
+    private void setFilterByCategoryItems(){
+        if(isEarnShowing){
+            filterByCategory.getItems().clear();
+            EarnCategory[] earnCategories= EarnCategory.values();
+            for(EarnCategory earning: earnCategories){
+                MenuItem earnCatItem= new MenuItem(String.valueOf(earning));
+                filterByCategory.getItems().add(earnCatItem);
+                earnCatItem.setOnAction(event -> {
+                    System.out.println(earning +" was selected");
+                });
+            }
+        }else{
+            filterByCategory.getItems().clear();
+            SpendCategory[] spendCategories= SpendCategory.values();
+            for(SpendCategory spending: spendCategories){
+                MenuItem spendCatItem= new MenuItem(String.valueOf(spending));
+                filterByCategory.getItems().add(spendCatItem);
+                spendCatItem.setOnAction(event -> {
+                    System.out.println(spending +" was selected");
+                });
+            }
+        }
+    }
+
+    protected static void loadSelectedYearFromFile(int selectedYear,int day, int month, int year){
+        System.out.println("Supposed to load new JSON File containing\n " +
+                "income and expenses for the selected year: "+selectedYear+"\n" +
+                "Then assign them to a new dynamically created ArrayList\n\n");
+
+        if(day!=0&&month!=0&&year!=0){
+            System.out.println("Then go ahead and filter the ArrayList to contain only\n " +
+                    "income and expenses for the specific day\\month\\year: "+day+"\\"+month+"\\"+year+"\n");
+            filterByDate.setDisable(true);
+        }else{
+            filterByDate.setDisable(false);
+        }
+        setFilterByDateItems(selectedYear);
     }
 
     protected static void logRecord(String timeInterval,int day, int month, int year){
