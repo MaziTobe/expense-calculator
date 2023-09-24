@@ -4,7 +4,6 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
@@ -13,6 +12,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
 import java.time.LocalDate;
+import java.util.Calendar;
 
 public class SelectionPopUp extends Stage {
     public SelectionPopUp(boolean showSpecificDate,String instruction){
@@ -22,8 +22,11 @@ public class SelectionPopUp extends Stage {
 
         DatePicker datePicker= new DatePicker();
 
-        TextField yearInputFiled= new TextField();
-        yearInputFiled.setAlignment(Pos.CENTER);
+        ComboBox yearSelector= new ComboBox();
+        int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+        for (int year = 2020; year <= currentYear; year++) {
+            yearSelector.getItems().add(year);
+        }
 
         Button submitSelection= new Button("submit");
         if(showSpecificDate){
@@ -33,7 +36,8 @@ public class SelectionPopUp extends Stage {
                     int day = localDate.getDayOfMonth();
                     int month = localDate.getMonthValue();
                     int year = localDate.getYear();
-                    TransactionRecordView.loadSelectedYearFromFile(year,day,month,year);
+                    TransactionRecordView.loadSelectedYearFromFile(year,month,day);
+                    TransactionRecordView.logRecord();
                     close();
                 }catch (Exception exc){
                     infoDisplay.setTextFill(new Color(1,0,0,1));
@@ -43,8 +47,9 @@ public class SelectionPopUp extends Stage {
         }else{
             submitSelection.setOnAction(event1 -> {
                 try{
-                    int selectedYear= Integer.parseInt(yearInputFiled.getText());
-                    TransactionRecordView.loadSelectedYearFromFile(selectedYear,0,0,0);
+                    int selectedYear= Integer.parseInt(yearSelector.getSelectionModel().getSelectedItem().toString());
+                    TransactionRecordView.loadSelectedYearFromFile(selectedYear,0,0);
+                    TransactionRecordView.logRecord();
                     close();
                 }catch (Exception exc){
                     infoDisplay.setTextFill(new Color(1,0,0,1));
@@ -62,7 +67,7 @@ public class SelectionPopUp extends Stage {
         if(showSpecificDate){
             container.getChildren().addAll(infoDisplay,datePicker,submitSelection);
         }else{
-            container.getChildren().addAll(infoDisplay,yearInputFiled,submitSelection);
+            container.getChildren().addAll(infoDisplay,yearSelector,submitSelection);
         }
 
         Scene popUpScene= new Scene(container);

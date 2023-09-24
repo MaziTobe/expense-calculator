@@ -8,8 +8,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 
 public class AppDataSaver {
     private static final ObjectMapper mapper = new ObjectMapper();
@@ -19,8 +20,7 @@ public class AppDataSaver {
     protected static ArrayList<Earning> loadedEarning;
     protected static ArrayList<Spending> loadedSpending;
 
-    public AppDataSaver( ) {
-     }
+    private static File saveDirectory;
 
     protected static void saveToJSON(){
         try{
@@ -49,10 +49,24 @@ public class AppDataSaver {
         }
     }
 
+    protected static List<Earning> loadEarnFromJSON(int selectedYear) throws IOException{
+        String currentYear= String.valueOf(selectedYear);
+        String jsonEarnFilePathToLoad= saveDirectory.getPath()+"\\earnFile"+currentYear+".JSON";
+        return mapper.readValue(new File(jsonEarnFilePathToLoad),
+                     new TypeReference<ArrayList<Earning>>(){});
+    }
+
+    protected static List<Spending> loadSpendFromJSON(int selectedYear) throws IOException{
+        String currentYear= String.valueOf(selectedYear);
+        String jsonSpendFilePathToLoad= saveDirectory.getPath()+"\\spendFile"+currentYear+".JSON";
+        return mapper.readValue(new File(jsonSpendFilePathToLoad),
+         new TypeReference<ArrayList<Spending>>(){});
+    }
+
     protected static void createAppDataFolder(){
         String pathToAppDataFolder= System.getProperty("user.home")+"\\"+AppWindow.appName+"\\expense-calc-data";
         Path directory = Paths.get(pathToAppDataFolder);
-        File saveDirectory = new File(String.valueOf(directory));
+        saveDirectory = new File(String.valueOf(directory));
         if(!Files.exists(directory)){
             try {
                 Files.createDirectories(directory);
@@ -61,8 +75,9 @@ public class AppDataSaver {
                 e.printStackTrace();
             }
         }
-        jsonEarnFilePath= saveDirectory.getPath()+"\\earnFile.JSON";
-        jsonSpendFilePath= saveDirectory.getPath()+"\\spendFile.JSON";
+        String currentYear= String.valueOf(LocalDate.now().getYear());
+        jsonEarnFilePath= saveDirectory.getPath()+"\\earnFile"+currentYear+".JSON";
+        jsonSpendFilePath= saveDirectory.getPath()+"\\spendFile"+currentYear+".JSON";
         if(!Files.exists(Paths.get(jsonEarnFilePath))){
             try {
                 Files.createFile(Paths.get(jsonEarnFilePath));

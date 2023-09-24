@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.util.List;
 
 
 public class TransactionRecordView extends Scene {
@@ -14,12 +15,24 @@ public class TransactionRecordView extends Scene {
     protected static TextArea spentRegister;
     private boolean isEarnShowing;
     private VBox registerBox;
-    private Menu filterByCategory;
+    private final Menu filterByCategory;
     private static Menu filterByDate;
+    private static int dayInUse;
+    private static int monthInUse;
+    private static int yearInUse;
+    private static String earnCatInUse;
+    private static String spendCatInUse;
+    private static String intervalInUse;
+    private static List<Earning> earningListInUse;
+    private static List<Spending> spendingListInUse;
 
     public TransactionRecordView(VBox root) {
         super(root);
         isEarnShowing=true;
+        setFilterParameters(LocalDate.now().getDayOfMonth(),
+                LocalDate.now().getMonthValue(),
+                LocalDate.now().getYear(),"ALL","ALL",
+                "ALL_YEAR",AppDataSaver.loadedEarning, AppDataSaver.loadedSpending);
 
         MenuItem selectYearToLog = new MenuItem("select year to see record");
         selectYearToLog.setOnAction((event) -> {
@@ -62,8 +75,16 @@ public class TransactionRecordView extends Scene {
             String instruction="Please select date to see transaction on that day!";
             new SelectionPopUp(true,instruction).show();
         });
+        SeparatorMenuItem separatorMenuItem5 = new SeparatorMenuItem();
+        MenuItem clearAllFilters= new MenuItem("Clear All Filters");
+        clearAllFilters.setOnAction(event -> {
+            setFilterParameters(0, 0, yearInUse,"ALL","ALL",
+                    "ALL_YEAR",earningListInUse, spendingListInUse);
+            logRecord();
+        });
         Menu menu2 = new Menu("Record Filter");
-        menu2.getItems().addAll(filterByDate,separatorMenuItem3,filterByCategory,separatorMenuItem4,goToSpecificDay);
+        menu2.getItems().addAll(filterByDate,separatorMenuItem3,filterByCategory,separatorMenuItem4,
+                goToSpecificDay, separatorMenuItem5,clearAllFilters);
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().addAll(menu,menu2);
@@ -99,7 +120,10 @@ public class TransactionRecordView extends Scene {
                 MenuItem intervalCatItem= new MenuItem(String.valueOf(interval));
                 filterByDate.getItems().add(intervalCatItem);
                 intervalCatItem.setOnAction(event -> {
-                    System.out.println(interval +" was selected");
+                    String myIntervalCat= String.valueOf(interval);
+                    setFilterParameters(dayInUse, monthInUse, yearInUse,earnCatInUse,
+                            spendCatInUse, myIntervalCat,earningListInUse, spendingListInUse);
+                    logRecord();
                 });
             }
         }else{
@@ -109,7 +133,10 @@ public class TransactionRecordView extends Scene {
                 MenuItem dateCatItem= new MenuItem(String.valueOf(month));
                 filterByDate.getItems().add(dateCatItem);
                 dateCatItem.setOnAction(event -> {
-                    System.out.println(month +" was selected");
+                   int myMonth= month.getValue();
+                    setFilterParameters(dayInUse, myMonth, yearInUse,earnCatInUse,
+                            spendCatInUse, "ALL_IN_SELECTED_MONTH",earningListInUse, spendingListInUse);
+                    logRecord();
                 });
             }
         }
@@ -123,7 +150,10 @@ public class TransactionRecordView extends Scene {
                 MenuItem earnCatItem= new MenuItem(String.valueOf(earning));
                 filterByCategory.getItems().add(earnCatItem);
                 earnCatItem.setOnAction(event -> {
-                    System.out.println(earning +" was selected");
+                    String myEarnCat= String.valueOf(earning);
+                    setFilterParameters(dayInUse, monthInUse, yearInUse,myEarnCat,
+                            spendCatInUse, intervalInUse,earningListInUse, spendingListInUse);
+                    logRecord();
                 });
             }
         }else{
@@ -133,32 +163,62 @@ public class TransactionRecordView extends Scene {
                 MenuItem spendCatItem= new MenuItem(String.valueOf(spending));
                 filterByCategory.getItems().add(spendCatItem);
                 spendCatItem.setOnAction(event -> {
-                    System.out.println(spending +" was selected");
+                    String mySpendCat= String.valueOf(spending);
+                    setFilterParameters(dayInUse, monthInUse, yearInUse,earnCatInUse,
+                            mySpendCat, intervalInUse,earningListInUse, spendingListInUse);
+                    logRecord();
                 });
             }
         }
     }
 
-    protected static void loadSelectedYearFromFile(int selectedYear,int day, int month, int year){
-        System.out.println("Supposed to load new JSON File containing\n " +
-                "income and expenses for the selected year: "+selectedYear+"\n" +
-                "Then assign them to a new dynamically created ArrayList\n\n");
+    protected static void loadSelectedYearFromFile(int selectedYear,int month, int day){
+        if(selectedYear != yearInUse){
+            try{
+                earningListInUse= AppDataSaver.loadEarnFromJSON(selectedYear);
+                spendingListInUse= AppDataSaver.loadSpendFromJSON(selectedYear);
+            }catch(Exception exc){
+                new ErrorMessage("Record Fetching Error","Unable to " +
+                         "find and/or load the record for "+selectedYear+"!!!").show();
+            }
+        }
 
-        if(day!=0&&month!=0&&year!=0){
-            System.out.println("Then go ahead and filter the ArrayList to contain only\n " +
-                    "income and expenses for the specific day\\month\\year: "+day+"\\"+month+"\\"+year+"\n");
+        if(day!=0&&month!=0){
             filterByDate.setDisable(true);
+            setFilterParameters(day, month, selectedYear,"ALL","ALL",
+                    "NONE_SELECTED",earningListInUse, spendingListInUse);
         }else{
             filterByDate.setDisable(false);
+            setFilterParameters(0, 0, selectedYear,"ALL","ALL",
+                    "ALL_YEAR",earningListInUse, spendingListInUse);
         }
         setFilterByDateItems(selectedYear);
     }
 
-    protected static void logRecord(String timeInterval,int day, int month, int year){
+    private static void setFilterParameters(int day,int month,int year, String earnCat,String spendCat,
+                                            String interval, List<Earning> earnList, List<Spending> spendList){
+        dayInUse = day; monthInUse = month; yearInUse = year;
+        earnCatInUse = earnCat; spendCatInUse = spendCat; intervalInUse = interval;
+        earningListInUse = earnList; spendingListInUse = spendList;
+    }
+
+    protected static void logRecord(){
+        earnedRegister.setText("Showing INCOME records for: \n" +
+                "Day: "+ dayInUse+",___ Month: "+ monthInUse+",___ Year: "+yearInUse+"\n" +
+                "Interval set to: "+intervalInUse+"\n"+
+                "EarnCategory of: "+earnCatInUse+"\n\n");
+
+        spentRegister.setText("Showing EXPENSE records for: \n" +
+                "Day: "+ dayInUse+",___ Month: "+ monthInUse+",___ Year: "+yearInUse+"\n" +
+                "Interval set to: "+intervalInUse+"\n"+
+                "SpendCategory of: "+spendCatInUse+"\n\n");
+    }
+
+    /**protected static void logRecord(){
         boolean isDay, isMonth, isYear;
         if(timeInterval.equalsIgnoreCase("day")){
             earnedRegister.setText("Log of all incomes on "+day+"\\"+month+"\\"+year+"\n\n");
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: earningListInUse){
                 isDay= earning.getTransactionDay()==day;
                 isMonth= earning.getTransactionMonth()==month;
                 isYear= earning.getTransactionYear()==year;
@@ -172,7 +232,7 @@ public class TransactionRecordView extends Scene {
                }
             }
             spentRegister.setText("Log of all expenses on "+day+"\\"+month+"\\"+year+"\n\n");
-            for (Spending spend: AppDataSaver.loadedSpending){
+            for (Spending spend: spendingListInUse){
                 isDay= spend.getTransactionDay()==day;
                 isMonth= spend.getTransactionMonth()==month;
                 isYear= spend.getTransactionYear()==year;
@@ -187,7 +247,7 @@ public class TransactionRecordView extends Scene {
             }
         }else if(timeInterval.equalsIgnoreCase("month")){
             earnedRegister.setText("Log of all incomes in "+month+"\\"+year+"\n\n");
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: earningListInUse){
                 isMonth= earning.getTransactionMonth()==month;
                 isYear= earning.getTransactionYear()==year;
                 if(isMonth&&isYear){
@@ -200,7 +260,7 @@ public class TransactionRecordView extends Scene {
                 }
             }
             spentRegister.setText("Log of all expenses in "+month+"\\"+year+"\n\n");
-            for (Spending spend: AppDataSaver.loadedSpending){
+            for (Spending spend: spendingListInUse){
                 isMonth= spend.getTransactionMonth()==month;
                 isYear= spend.getTransactionYear()==year;
                 if(isMonth&&isYear){
@@ -214,7 +274,7 @@ public class TransactionRecordView extends Scene {
             }
         }else if(timeInterval.equalsIgnoreCase("year")){
             earnedRegister.setText("Log of all incomes in "+year+"\n\n");
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: earningListInUse){
                 isYear= earning.getTransactionYear()==year;
                 if(isYear){
                     earnedRegister.appendText("ID: "+earning.getTransactionID()+"\n"
@@ -226,7 +286,7 @@ public class TransactionRecordView extends Scene {
                 }
             }
             spentRegister.setText("Log of all expenses in "+year+"\n\n");
-            for (Spending spend: AppDataSaver.loadedSpending){
+            for (Spending spend: spendingListInUse){
                 isYear= spend.getTransactionYear()==year;
                 if(isYear){
                     spentRegister.appendText("ID: "+spend.getTransactionID()+"\n"
@@ -238,5 +298,5 @@ public class TransactionRecordView extends Scene {
                 }
             }
         }
-    }
+    }**/
 }

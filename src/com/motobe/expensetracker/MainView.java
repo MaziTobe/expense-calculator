@@ -103,8 +103,8 @@ public class MainView extends Scene {
         gotoLOGScreenButton.setOnMouseExited((event) -> gotoLOGScreenButton.setFill(AppState.textColorNormal));
         gotoLOGScreenButton.setOnMousePressed((event) -> {
             AppWindow.setWindowTitle("transaction records");
-            TransactionRecordView.logRecord("day", LocalDate.now().getDayOfMonth(),
-                    LocalDate.now().getMonthValue(),LocalDate.now().getYear());
+            TransactionRecordView.loadSelectedYearFromFile(LocalDate.now().getYear(),0,0);
+            TransactionRecordView.logRecord();
             AppWindow.mainStage.setScene(AppWindow.transactionRecordView);
         });
         HBox gotoFullScreenBox = new HBox();
