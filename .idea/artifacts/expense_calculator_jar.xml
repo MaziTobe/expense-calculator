@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="jar" build-on-make="true" name="expense-calculator:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/expense_calculator_jar</output-path>
+    <root id="archive" name="expense-calculator.jar">
+      <element id="module-output" name="expense-calculator" />
+    </root>
+  </artifact>
+</component>
