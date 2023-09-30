@@ -125,7 +125,7 @@ public class MainView extends Scene {
         String timeInterval= timeScaleSelector.getSelectionModel().getSelectedItem().toString();
 
         if(timeInterval.equalsIgnoreCase("TODAY")){
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: AppDataSaver.earningArrayList){
                 boolean isDay= earning.getTransactionDay()==LocalDate.now().getDayOfMonth();
                 boolean isMonth= earning.getTransactionMonth()==LocalDate.now().getMonthValue();
                 boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
@@ -133,7 +133,7 @@ public class MainView extends Scene {
                     totalEarning = totalEarning + earning.getAmountEarned();
                 }
             }
-            for (Spending spending: AppDataSaver.loadedSpending){
+            for (Spending spending: AppDataSaver.spendingArrayList){
                 boolean isDay= spending.getTransactionDay()==LocalDate.now().getDayOfMonth();
                 boolean isMonth= spending.getTransactionMonth()==LocalDate.now().getMonthValue();
                 boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
@@ -142,14 +142,14 @@ public class MainView extends Scene {
                 }
             }
         }else if(timeInterval.equalsIgnoreCase("THIS_MONTH")){
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: AppDataSaver.earningArrayList){
                 boolean isMonth= earning.getTransactionMonth()==LocalDate.now().getMonthValue();
                 boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
                 if(isMonth&&isYear){
                     totalEarning = totalEarning + earning.getAmountEarned();
                 }
             }
-            for (Spending spending: AppDataSaver.loadedSpending){
+            for (Spending spending: AppDataSaver.spendingArrayList){
                 boolean isMonth= spending.getTransactionMonth()==LocalDate.now().getMonthValue();
                 boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
                 if(isMonth&&isYear){
@@ -157,13 +157,13 @@ public class MainView extends Scene {
                 }
             }
         }else if(timeInterval.equalsIgnoreCase("THIS_YEAR")){
-            for (Earning earning: AppDataSaver.loadedEarning){
+            for (Earning earning: AppDataSaver.earningArrayList){
                 boolean isYear= earning.getTransactionYear()==LocalDate.now().getYear();
                 if(isYear){
                     totalEarning = totalEarning + earning.getAmountEarned();
                 }
             }
-            for (Spending spending: AppDataSaver.loadedSpending){
+            for (Spending spending: AppDataSaver.spendingArrayList){
                 boolean isYear= spending.getTransactionYear()==LocalDate.now().getYear();
                 if(isYear){
                     totalSpending = totalSpending + spending.getAmountSpent();

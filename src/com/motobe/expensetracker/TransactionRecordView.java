@@ -15,7 +15,7 @@ import java.util.List;
 public class TransactionRecordView extends Scene {
     protected static TextArea earnedRegister;
     protected static TextArea spentRegister;
-    private boolean isEarnShowing;
+    private static boolean isEarnShowing;
     private VBox registerBox;
     private final Menu filterByCategory;
     private static Menu filterByDate;
@@ -40,7 +40,7 @@ public class TransactionRecordView extends Scene {
         setFilterParameters(LocalDate.now().getDayOfMonth(),
                 LocalDate.now().getMonthValue(),
                 LocalDate.now().getYear(),"ALL","ALL",
-                AppDataSaver.loadedEarning, AppDataSaver.loadedSpending);
+                AppDataSaver.earningArrayList, AppDataSaver.spendingArrayList);
 
         MenuItem selectYearToLog = new MenuItem("select year to see record");
         selectYearToLog.setOnAction((event) -> {
@@ -55,11 +55,13 @@ public class TransactionRecordView extends Scene {
                 registerBox.getChildren().addAll(spendHeaderLabel,spentRegister);
                 isEarnShowing=false;
                 switchEarnSpend.setText("switch to income record");
+                logRecord();
             }else{
                 registerBox.getChildren().removeAll(earnHeaderLabel,spendHeaderLabel,earnedRegister,spentRegister);
                 registerBox.getChildren().addAll(earnHeaderLabel,earnedRegister);
                 isEarnShowing=true;
                 switchEarnSpend.setText("switch to expense record");
+                logRecord();
             }
             setFilterByCategoryItems();
         });
@@ -245,68 +247,66 @@ public class TransactionRecordView extends Scene {
     }
 
     protected static void logRecord(){
-        earnedRegister.setText("");
-        spentRegister.setText("");
-
-        if(monthInUse!=0){
-            if(dayInUse!=0){
-                if(!earnCatInUse.equalsIgnoreCase("ALL")){
-                    for(Earning myEarn: earningListInUse){
-                        if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)
-                                &&myEarn.getTransactionDay()==dayInUse
-                                &&myEarn.getTransactionMonth()==monthInUse){
-                            earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
-                                    +"Amount: "+myEarn.getAmountEarned()+"\n"
-                                    +"Category: "+myEarn.getTransactionCategory()+"\n"
-                                    +"Description: "+myEarn.getTransactionDescription()+"\n"
-                                    +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
-                                    +"\\"+myEarn.getTransactionYear()+"\n\n");
+        if(isEarnShowing){
+            earnedRegister.setText("");
+            if(monthInUse!=0){
+                if(dayInUse!=0){
+                    if(!earnCatInUse.equalsIgnoreCase("ALL")){
+                        for(Earning myEarn: earningListInUse){
+                            if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)
+                                    &&myEarn.getTransactionDay()==dayInUse
+                                    &&myEarn.getTransactionMonth()==monthInUse){
+                                earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
+                                        +"Amount: "+myEarn.getAmountEarned()+"\n"
+                                        +"Category: "+myEarn.getTransactionCategory()+"\n"
+                                        +"Description: "+myEarn.getTransactionDescription()+"\n"
+                                        +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
+                                        +"\\"+myEarn.getTransactionYear()+"\n\n");
+                            }
+                        }
+                    }else{
+                        for(Earning myEarn: earningListInUse){
+                            if(myEarn.getTransactionDay()==dayInUse
+                                    &&myEarn.getTransactionMonth()==monthInUse){
+                                earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
+                                        +"Amount: "+myEarn.getAmountEarned()+"\n"
+                                        +"Category: "+myEarn.getTransactionCategory()+"\n"
+                                        +"Description: "+myEarn.getTransactionDescription()+"\n"
+                                        +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
+                                        +"\\"+myEarn.getTransactionYear()+"\n\n");
+                            }
                         }
                     }
                 }else{
-                    for(Earning myEarn: earningListInUse){
-                        if(myEarn.getTransactionDay()==dayInUse
-                                &&myEarn.getTransactionMonth()==monthInUse){
-                            earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
-                                    +"Amount: "+myEarn.getAmountEarned()+"\n"
-                                    +"Category: "+myEarn.getTransactionCategory()+"\n"
-                                    +"Description: "+myEarn.getTransactionDescription()+"\n"
-                                    +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
-                                    +"\\"+myEarn.getTransactionYear()+"\n\n");
+                    if(!earnCatInUse.equalsIgnoreCase("ALL")){
+                        for(Earning myEarn: earningListInUse){
+                            if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)
+                                    &&myEarn.getTransactionMonth()==monthInUse){
+                                earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
+                                        +"Amount: "+myEarn.getAmountEarned()+"\n"
+                                        +"Category: "+myEarn.getTransactionCategory()+"\n"
+                                        +"Description: "+myEarn.getTransactionDescription()+"\n"
+                                        +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
+                                        +"\\"+myEarn.getTransactionYear()+"\n\n");
+                            }
                         }
-                    }
-                }
-                if(!spendCatInUse.equalsIgnoreCase("ALL")){
-                    for(Spending mySpend: spendingListInUse){
-                        if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)
-                                &&mySpend.getTransactionDay()==dayInUse
-                                &&mySpend.getTransactionMonth()==monthInUse){
-                            spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
-                                    +"Amount: "+mySpend.getAmountSpent()+"\n"
-                                    +"Category: "+mySpend.getTransactionCategory()+"\n"
-                                    +"Description: "+mySpend.getTransactionDescription()+"\n"
-                                    +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
-                                    +"\\"+mySpend.getTransactionYear()+"\n\n");
-                        }
-                    }
-                }else{
-                    for(Spending mySpend: spendingListInUse){
-                        if(mySpend.getTransactionDay()==dayInUse
-                                &&mySpend.getTransactionMonth()==monthInUse){
-                            spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
-                                    +"Amount: "+mySpend.getAmountSpent()+"\n"
-                                    +"Category: "+mySpend.getTransactionCategory()+"\n"
-                                    +"Description: "+mySpend.getTransactionDescription()+"\n"
-                                    +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
-                                    +"\\"+mySpend.getTransactionYear()+"\n\n");
+                    }else{
+                        for(Earning myEarn: earningListInUse){
+                            if(myEarn.getTransactionMonth()==monthInUse){
+                                earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
+                                        +"Amount: "+myEarn.getAmountEarned()+"\n"
+                                        +"Category: "+myEarn.getTransactionCategory()+"\n"
+                                        +"Description: "+myEarn.getTransactionDescription()+"\n"
+                                        +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
+                                        +"\\"+myEarn.getTransactionYear()+"\n\n");
+                            }
                         }
                     }
                 }
             }else{
                 if(!earnCatInUse.equalsIgnoreCase("ALL")){
                     for(Earning myEarn: earningListInUse){
-                        if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)
-                                &&myEarn.getTransactionMonth()==monthInUse){
+                        if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)){
                             earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
                                     +"Amount: "+myEarn.getAmountEarned()+"\n"
                                     +"Category: "+myEarn.getTransactionCategory()+"\n"
@@ -317,45 +317,6 @@ public class TransactionRecordView extends Scene {
                     }
                 }else{
                     for(Earning myEarn: earningListInUse){
-                        if(myEarn.getTransactionMonth()==monthInUse){
-                            earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
-                                    +"Amount: "+myEarn.getAmountEarned()+"\n"
-                                    +"Category: "+myEarn.getTransactionCategory()+"\n"
-                                    +"Description: "+myEarn.getTransactionDescription()+"\n"
-                                    +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
-                                    +"\\"+myEarn.getTransactionYear()+"\n\n");
-                        }
-                    }
-                }
-                if(!spendCatInUse.equalsIgnoreCase("ALL")){
-                    for(Spending mySpend: spendingListInUse){
-                        if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)
-                                &&mySpend.getTransactionMonth()==monthInUse){
-                            spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
-                                    +"Amount: "+mySpend.getAmountSpent()+"\n"
-                                    +"Category: "+mySpend.getTransactionCategory()+"\n"
-                                    +"Description: "+mySpend.getTransactionDescription()+"\n"
-                                    +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
-                                    +"\\"+mySpend.getTransactionYear()+"\n\n");
-                        }
-                    }
-                }else{
-                    for(Spending mySpend: spendingListInUse){
-                        if(mySpend.getTransactionMonth()==monthInUse){
-                            spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
-                                    +"Amount: "+mySpend.getAmountSpent()+"\n"
-                                    +"Category: "+mySpend.getTransactionCategory()+"\n"
-                                    +"Description: "+mySpend.getTransactionDescription()+"\n"
-                                    +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
-                                    +"\\"+mySpend.getTransactionYear()+"\n\n");
-                        }
-                    }
-                }
-            }
-        }else{
-            if(!earnCatInUse.equalsIgnoreCase("ALL")){
-                for(Earning myEarn: earningListInUse){
-                    if(myEarn.getTransactionCategory().equalsIgnoreCase(earnCatInUse)){
                         earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
                                 +"Amount: "+myEarn.getAmountEarned()+"\n"
                                 +"Category: "+myEarn.getTransactionCategory()+"\n"
@@ -364,19 +325,80 @@ public class TransactionRecordView extends Scene {
                                 +"\\"+myEarn.getTransactionYear()+"\n\n");
                     }
                 }
-            }else{
-                for(Earning myEarn: earningListInUse){
-                    earnedRegister.appendText("ID: "+myEarn.getTransactionID()+"\n"
-                            +"Amount: "+myEarn.getAmountEarned()+"\n"
-                            +"Category: "+myEarn.getTransactionCategory()+"\n"
-                            +"Description: "+myEarn.getTransactionDescription()+"\n"
-                            +"Date: "+myEarn.getTransactionDay()+"\\"+myEarn.getTransactionMonth()
-                            +"\\"+myEarn.getTransactionYear()+"\n\n");
-                }
             }
-            if(!spendCatInUse.equalsIgnoreCase("ALL")){
-                for(Spending mySpend: spendingListInUse){
-                    if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)){
+            earnHeaderLabel.setText("Showing INCOME records for: "
+                    +dayInUse+"/"+ monthInUse+"/"+yearInUse+"\n"
+                    +"EarnCategory of: "+earnCatInUse);
+        }else{
+            spentRegister.setText("");
+            if(monthInUse!=0){
+                if(dayInUse!=0){
+                    if(!spendCatInUse.equalsIgnoreCase("ALL")){
+                        for(Spending mySpend: spendingListInUse){
+                            if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)
+                                    &&mySpend.getTransactionDay()==dayInUse
+                                    &&mySpend.getTransactionMonth()==monthInUse){
+                                spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
+                                        +"Amount: "+mySpend.getAmountSpent()+"\n"
+                                        +"Category: "+mySpend.getTransactionCategory()+"\n"
+                                        +"Description: "+mySpend.getTransactionDescription()+"\n"
+                                        +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
+                                        +"\\"+mySpend.getTransactionYear()+"\n\n");
+                            }
+                        }
+                    }else{
+                        for(Spending mySpend: spendingListInUse){
+                            if(mySpend.getTransactionDay()==dayInUse
+                                    &&mySpend.getTransactionMonth()==monthInUse){
+                                spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
+                                        +"Amount: "+mySpend.getAmountSpent()+"\n"
+                                        +"Category: "+mySpend.getTransactionCategory()+"\n"
+                                        +"Description: "+mySpend.getTransactionDescription()+"\n"
+                                        +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
+                                        +"\\"+mySpend.getTransactionYear()+"\n\n");
+                            }
+                        }
+                    }
+                }else{
+                    if(!spendCatInUse.equalsIgnoreCase("ALL")){
+                        for(Spending mySpend: spendingListInUse){
+                            if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)
+                                    &&mySpend.getTransactionMonth()==monthInUse){
+                                spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
+                                        +"Amount: "+mySpend.getAmountSpent()+"\n"
+                                        +"Category: "+mySpend.getTransactionCategory()+"\n"
+                                        +"Description: "+mySpend.getTransactionDescription()+"\n"
+                                        +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
+                                        +"\\"+mySpend.getTransactionYear()+"\n\n");
+                            }
+                        }
+                    }else{
+                        for(Spending mySpend: spendingListInUse){
+                            if(mySpend.getTransactionMonth()==monthInUse){
+                                spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
+                                        +"Amount: "+mySpend.getAmountSpent()+"\n"
+                                        +"Category: "+mySpend.getTransactionCategory()+"\n"
+                                        +"Description: "+mySpend.getTransactionDescription()+"\n"
+                                        +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
+                                        +"\\"+mySpend.getTransactionYear()+"\n\n");
+                            }
+                        }
+                    }
+                }
+            }else{
+                if(!spendCatInUse.equalsIgnoreCase("ALL")){
+                    for(Spending mySpend: spendingListInUse){
+                        if(mySpend.getTransactionCategory().equalsIgnoreCase(spendCatInUse)){
+                            spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
+                                    +"Amount: "+mySpend.getAmountSpent()+"\n"
+                                    +"Category: "+mySpend.getTransactionCategory()+"\n"
+                                    +"Description: "+mySpend.getTransactionDescription()+"\n"
+                                    +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
+                                    +"\\"+mySpend.getTransactionYear()+"\n\n");
+                        }
+                    }
+                }else{
+                    for(Spending mySpend: spendingListInUse){
                         spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
                                 +"Amount: "+mySpend.getAmountSpent()+"\n"
                                 +"Category: "+mySpend.getTransactionCategory()+"\n"
@@ -385,22 +407,10 @@ public class TransactionRecordView extends Scene {
                                 +"\\"+mySpend.getTransactionYear()+"\n\n");
                     }
                 }
-            }else{
-                for(Spending mySpend: spendingListInUse){
-                    spentRegister.appendText("ID: "+mySpend.getTransactionID()+"\n"
-                            +"Amount: "+mySpend.getAmountSpent()+"\n"
-                            +"Category: "+mySpend.getTransactionCategory()+"\n"
-                            +"Description: "+mySpend.getTransactionDescription()+"\n"
-                            +"Date: "+mySpend.getTransactionDay()+"\\"+mySpend.getTransactionMonth()
-                            +"\\"+mySpend.getTransactionYear()+"\n\n");
-                }
             }
+            spendHeaderLabel.setText("Showing EXPENSE records for: "
+                    +dayInUse+"/"+ monthInUse+"/"+yearInUse+"\n"
+                    +"SpendCategory of: "+spendCatInUse);
         }
-        earnHeaderLabel.setText("Showing INCOME records for: "
-                +dayInUse+"/"+ monthInUse+"/"+yearInUse+"\n"
-                +"EarnCategory of: "+earnCatInUse);
-        spendHeaderLabel.setText("Showing EXPENSE records for: "
-                +dayInUse+"/"+ monthInUse+"/"+yearInUse+"\n"
-                +"SpendCategory of: "+spendCatInUse);
     }
 }

@@ -3,6 +3,9 @@
     <output-path>$PROJECT_DIR$/out/artifacts/expense_calculator_jar</output-path>
     <root id="archive" name="expense-calculator.jar">
       <element id="module-output" name="expense-calculator" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Other Resources/jackson JSON jar files/jackson-core-2.15.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Other Resources/jackson JSON jar files/jackson-annotations-2.15.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$PROJECT_DIR$/../../../../Other Resources/jackson JSON jar files/jackson-databind-2.15.2.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

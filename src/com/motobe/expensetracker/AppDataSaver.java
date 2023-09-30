@@ -16,21 +16,19 @@ public class AppDataSaver {
     private static final ObjectMapper mapper = new ObjectMapper();
     private static String jsonEarnFilePath = "";
     private static String jsonSpendFilePath = "";
-
-    protected static ArrayList<Earning> loadedEarning;
-    protected static ArrayList<Spending> loadedSpending;
-
+    protected static ArrayList<Earning> earningArrayList;
+    protected static ArrayList<Spending> spendingArrayList;
     private static File saveDirectory;
 
     protected static void saveToJSON(){
         try{
-            mapper.writeValue(new File(jsonEarnFilePath), loadedEarning);
+            mapper.writeValue(new File(jsonEarnFilePath), earningArrayList);
         }catch(IOException e){
             new ErrorMessage("Error Saving Income Data!",
                     "Missing JSON file to log app data!!!\nSee details below:\n"+e+"\n\n").show();
         }
         try{
-            mapper.writeValue(new File(jsonSpendFilePath), loadedSpending);
+            mapper.writeValue(new File(jsonSpendFilePath), spendingArrayList);
         }catch(IOException e){
             new ErrorMessage("Error Saving Expense Data!",
                     "Missing JSON file to log app data!!!\nSee details below:\n"+e+"\n\n").show();
@@ -39,13 +37,13 @@ public class AppDataSaver {
 
     protected static void loadFromJSON(){
         try {
-            loadedEarning = mapper.readValue(new File(jsonEarnFilePath),
+            earningArrayList = mapper.readValue(new File(jsonEarnFilePath),
                     new TypeReference<ArrayList<Earning>>(){});
-            loadedSpending = mapper.readValue(new File(jsonSpendFilePath),
+            spendingArrayList = mapper.readValue(new File(jsonSpendFilePath),
                     new TypeReference<ArrayList<Spending>>(){});
         }catch(IOException e){
-            loadedEarning = new ArrayList<>();
-            loadedSpending= new ArrayList<>();
+            earningArrayList = new ArrayList<>();
+            spendingArrayList = new ArrayList<>();
         }
     }
 

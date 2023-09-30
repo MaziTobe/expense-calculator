@@ -114,7 +114,7 @@ public class SpendingView extends Scene {
                 newSpending.setTransactionDay(Integer.parseInt((new SimpleDateFormat("dd")).format(new Date())));
                 newSpending.setTransactionMonth(Integer.parseInt((new SimpleDateFormat("MM")).format(new Date())));
                 newSpending.setTransactionYear(Integer.parseInt((new SimpleDateFormat("yyyy")).format(new Date())));
-                AppDataSaver.loadedSpending.add(newSpending);
+                AppDataSaver.spendingArrayList.add(newSpending);
                 setChartData();
                 AppDataSaver.saveToJSON();
             } catch (InputMismatchException var22) {
@@ -166,7 +166,7 @@ public class SpendingView extends Scene {
         double HELP_STRANGER = 0.0D;
         double REPAY_LOAN = 0.0D;
 
-        for(Spending spend: AppDataSaver.loadedSpending){
+        for(Spending spend: AppDataSaver.spendingArrayList){
             switch (spend.getTransactionCategory()) {
                 case "POCKET_SELF":
                     POCKET_SELF += spend.getAmountSpent();

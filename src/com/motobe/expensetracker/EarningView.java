@@ -114,7 +114,7 @@ public class EarningView extends Scene {
                 newEarning.setTransactionDay(Integer.parseInt((new SimpleDateFormat("dd")).format(new Date())));
                 newEarning.setTransactionMonth(Integer.parseInt((new SimpleDateFormat("MM")).format(new Date())));
                 newEarning.setTransactionYear(Integer.parseInt((new SimpleDateFormat("yyyy")).format(new Date())));
-                AppDataSaver.loadedEarning.add(newEarning);
+                AppDataSaver.earningArrayList.add(newEarning);
                 setChartData();
                 AppDataSaver.saveToJSON();
             } catch (InputMismatchException exc) {
@@ -157,7 +157,7 @@ public class EarningView extends Scene {
         double PROFIT_FROM_TRADES = 0.0D;
         double BORROWED = 0.0D;
 
-        for(Earning earn: AppDataSaver.loadedEarning){
+        for(Earning earn: AppDataSaver.earningArrayList){
             switch (earn.getTransactionCategory()) {
                 case "SALARY":
                     SALARY += earn.getAmountEarned();
